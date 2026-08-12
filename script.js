@@ -1,6 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
-
+import { getFirestore, collection, addDoc, Timestamp } from "firebase/firestore";
 // KONFIGURASI FIREBASE ANDA
 const firebaseConfig = {
   apiKey: "AIzaSyD9EW1tLul16msN5LZbeV4LE77LwMZuZ5M",
@@ -14,7 +13,25 @@ const firebaseConfig = {
 
 // Inisialisasi Firebase
 const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+const db = getFirestore(app); // Firestore DB
+
+async function simpanData(inputUser) {
+  // Hitung waktu kedaluwarsa (misalnya 24 jam dari sekarang)
+  const waktuHapus = new Date();
+  waktuHapus.setHours(waktuHapus.getHours() + 24);
+
+  try {
+    // Menyimpan ke collection "pesanan" (atau nama collection Anda)
+    const docRef = await addDoc(collection(db, "pesanan"), {
+      dataInput: inputUser,
+      createdAt: Timestamp.now(),
+      expireAt: Timestamp.fromDate(waktuHapus) // Field pemicu TTL
+    });
+    console.log("Data berhasil disimpan dengan ID: ", docRef.id);
+  } catch (e) {
+    console.error("Gagal menyimpan data: ", e);
+  }
+}
 
 // State Lokal
 let modalBalance = 0;
