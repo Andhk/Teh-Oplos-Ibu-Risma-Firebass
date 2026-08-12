@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teh Oplos Ibu Risma - Sistem POS</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Chart.js untuk Grafik -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="nav-brand">Teh Oplos Ibu Risma</div>
+    <div class="nav-menu">
+      <button class="nav-btn active" onclick="switchPage('pos')">Kasir / POS</button>
+      <button class="nav-btn" onclick="switchPage('stats')">Statistik & Laporan</button>
+    </div>
+  </nav>
+
+  <div class="container">
+
+    <!-- PAGE 1: KASIR & INPUT -->
+    <div id="page-pos" class="page active-page">
+      
+      <!-- Panel Modal Awal & Sisa Kas -->
+      <section class="card modal-card">
+        <h2>Modal Awal & Sisa Kas Operasional</h2>
+        <div class="modal-grid">
+          <div class="modal-info-box">
+            <span>Sisa Kas Modal Awal</span>
+            <strong id="display-modal-balance">Rp 0</strong>
+          </div>
+          <form id="modal-form" onsubmit="addModal(event)" class="modal-form-inline">
+            <div class="form-group">
+              <label for="modal-input">Tambah Deposit Modal (Rp):</label>
+              <input type="number" id="modal-input" class="form-control" placeholder="Contoh: 100000" min="1" required>
+            </div>
+            <button type="submit" class="btn btn-success">+ Input Deposit</button>
+          </form>
+        </div>
+      </section>
+
+      <!-- Ringkasan Stok -->
+      <section class="card">
+        <h2>Stok Bahan & Produk</h2>
+        <div class="stock-grid">
+          <div class="stock-item">
+            <span>Cup Besar</span>
+            <strong id="stock-cup-besar">0</strong>
+            <div class="stock-actions">
+              <button class="btn-sm btn-add" onclick="editStock('cupBesar', 'add')">+ Tambah</button>
+              <button class="btn-sm btn-reduce" onclick="editStock('cupBesar', 'reduce')">- Kurang</button>
+            </div>
+          </div>
+          <div class="stock-item">
+            <span>Cup Kecil</span>
+            <strong id="stock-cup-kecil">0</strong>
+            <div class="stock-actions">
+              <button class="btn-sm btn-add" onclick="editStock('cupKecil', 'add')">+ Tambah</button>
+              <button class="btn-sm btn-reduce" onclick="editStock('cupKecil', 'reduce')">- Kurang</button>
+            </div>
+          </div>
+          <div class="stock-item">
+            <span>Kopi</span>
+            <strong id="stock-kopi">0</strong>
+            <div class="stock-actions">
+              <button class="btn-sm btn-add" onclick="editStock('kopi', 'add')">+ Tambah</button>
+              <button class="btn-sm btn-reduce" onclick="editStock('kopi', 'reduce')">- Kurang</button>
+            </div>
+          </div>
+          <div class="stock-item">
+            <span>Creamer</span>
+            <strong id="stock-creamer">0</strong>
+            <div class="stock-actions">
+              <button class="btn-sm btn-add" onclick="editStock('creamer', 'add')">+ Tambah</button>
+              <button class="btn-sm btn-reduce" onclick="editStock('creamer', 'reduce')">- Kurang</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="pos-grid">
+        <!-- Area Menu Produk -->
+        <section class="card">
+          <h2>Menu Penjualan</h2>
+          <div class="product-grid">
+            <button class="product-card" onclick="addToCart('Cup Besar', 5000, 'teh', {cupBesar: 1})">
+              <span class="p-name">Cup Besar</span>
+              <span class="p-price">Rp 5.000</span>
+              <span class="p-cat cat-teh">Kategori: Teh</span>
+            </button>
+            <button class="product-card" onclick="addToCart('Cup Besar + Creamer', 7000, 'teh', {cupBesar: 1, creamer: 1})">
+              <span class="p-name">Cup Besar + Creamer</span>
+              <span class="p-price">Rp 7.000</span>
+              <span class="p-cat cat-teh">Kategori: Teh</span>
+            </button>
+            <button class="product-card" onclick="addToCart('Cup Kecil', 3000, 'teh', {cupKecil: 1})">
+              <span class="p-name">Cup Kecil</span>
+              <span class="p-price">Rp 3.000</span>
+              <span class="p-cat cat-teh">Kategori: Teh</span>
+            </button>
+            <button class="product-card" onclick="addToCart('Cup Kecil + Creamer', 5000, 'teh', {cupKecil: 1, creamer: 1})">
+              <span class="p-name">Cup Kecil + Creamer</span>
+              <span class="p-price">Rp 5.000</span>
+              <span class="p-cat cat-teh">Kategori: Teh</span>
+            </button>
+            <button class="product-card" onclick="addToCart('Creamer (Ekstra)', 2000, 'teh', {creamer: 1})">
+              <span class="p-name">Creamer</span>
+              <span class="p-price">Rp 2.000</span>
+              <span class="p-cat cat-teh">Kategori: Teh</span>
+            </button>
+            <button class="product-card" onclick="addToCart('Kopi', 5000, 'non-teh', {kopi: 1})">
+              <span class="p-name">Kopi</span>
+              <span class="p-price">Rp 5.000</span>
+              <span class="p-cat cat-other">Kategori: Kopi/Jajanan</span>
+            </button>
+            <button class="product-card" onclick="addToCart('Jajanan', 1000, 'non-teh', {})">
+              <span class="p-name">Jajanan</span>
+              <span class="p-price">Rp 1.000</span>
+              <span class="p-cat cat-other">Kategori: Kopi/Jajanan</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- Area Keranjang & Pembayaran -->
+        <section class="card">
+          <h2>Keranjang Transaksi</h2>
+          <div class="cart-list" id="cart-list">
+            <p class="empty-cart">Keranjang masih kosong</p>
+          </div>
+
+          <div class="subtotal-box">
+            <div class="subtotal-row">
+              <span>Total Teh:</span>
+              <strong id="subtotal-teh">Rp 0</strong>
+            </div>
+            <div class="subtotal-row">
+              <span>Total Kopi & Jajanan:</span>
+              <strong id="subtotal-non-teh">Rp 0</strong>
+            </div>
+            <hr>
+            <div class="subtotal-row total-row">
+              <span>Grand Total:</span>
+              <strong id="grand-total">Rp 0</strong>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="payment-method">Metode Pembayaran:</label>
+            <select id="payment-method" class="form-control">
+              <option value="Tunai">Tunai</option>
+              <option value="Utang">Utang</option>
+              <option value="QR">QR / QRIS</option>
+            </select>
+          </div>
+
+          <button class="btn btn-primary btn-block" onclick="processPayment()">Simpan Transaksi Penjualan</button>
+        </section>
+      </div>
+
+      <!-- Form Pengeluaran Tambahan -->
+      <section class="card">
+        <h2>Input Pengeluaran Operasional (Beli Es, Bahan, dll)</h2>
+        <form id="expense-form" onsubmit="addExpense(event)" class="form-grid">
+          <div class="form-group">
+            <label for="expense-name">Keterangan Pengeluaran:</label>
+            <input type="text" id="expense-name" class="form-control" placeholder="Contoh: Beli Es Batu, Sedotan" required>
+          </div>
+          <div class="form-group">
+            <label for="expense-amount">Jumlah (Rp):</label>
+            <input type="number" id="expense-amount" class="form-control" placeholder="10000" min="1" required>
+          </div>
+          <div class="form-group btn-align">
+            <button type="submit" class="btn btn-danger btn-block">Catat & Potong Modal</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Grafik Trafik Per Jam -->
+      <section class="card">
+        <h2>Trafik Penjualan Per Jam (Hari Ini)</h2>
+        <div class="chart-container">
+          <canvas id="hourlyChart"></canvas>
+        </div>
+      </section>
+
+      <!-- Riwayat Transaksi -->
+      <section class="card">
+        <h2>Riwayat Transaksi Terakhir</h2>
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Waktu</th>
+                <th>Tipe</th>
+                <th>Rincian</th>
+                <th>Metode</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody id="transaction-history">
+              <tr>
+                <td colspan="5" class="text-center">Belum ada transaksi hari ini.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- PAGE 2: STATISTIK & LAPORAN -->
+    <div id="page-stats" class="page">
+      <div class="stats-summary-grid">
+        <div class="card stat-box">
+          <h3>Sisa Kas Modal Awal</h3>
+          <p id="stat-modal-balance" class="text-primary">Rp 0</p>
+        </div>
+        <div class="card stat-box">
+          <h3>Total Penjualan Teh</h3>
+          <p id="stat-total-teh">Rp 0</p>
+        </div>
+        <div class="card stat-box">
+          <h3>Total Kopi & Jajanan</h3>
+          <p id="stat-total-non-teh">Rp 0</p>
+        </div>
+        <div class="card stat-box">
+          <h3>Total Pengeluaran</h3>
+          <p id="stat-total-expense" class="text-danger">Rp 0</p>
+        </div>
+      </div>
+
+      <!-- Tombol Export CSV -->
+      <div style="margin-top: 10px; margin-bottom: 10px; text-align: right;">
+        <button class="btn btn-excel" onclick="exportToCSV()">📊 Export Laporan ke CSV (Excel)</button>
+      </div>
+
+      <div class="stats-chart-grid">
+        <section class="card">
+          <h2>Statistik Sisa Stok</h2>
+          <div class="chart-container">
+            <canvas id="stockChart"></canvas>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>Statistik Penjualan Per Hari</h2>
+          <div class="chart-container">
+            <canvas id="dailyChart"></canvas>
+          </div>
+        </section>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Firebase SDK versi 9 (Modular) -->
+  <script type="module" src="script.js"></script>
+</body>
+</html>
